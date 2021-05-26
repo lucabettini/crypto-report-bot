@@ -1,4 +1,5 @@
-from modules.crypto_bot import crypto_bot
+from modules.CryptoBot import CryptoBot
 
 if __name__ == "__main__":
-    crypto_bot(hour='16:00', convert='EUR')
+    bot = CryptoBot(hour='19:25', convert='EUR')
+    bot.run()
