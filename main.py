@@ -1,5 +1,7 @@
 from modules.CryptoBot import CryptoBot
+from modules.CryptoReport import CryptoReport
 
 if __name__ == "__main__":
-    bot = CryptoBot(hour='19:25', convert='EUR')
+    report = CryptoReport
+    bot = CryptoBot(report=report, hour='23:39', convert='EUR')
     bot.run()

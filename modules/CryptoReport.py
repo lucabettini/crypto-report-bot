@@ -9,9 +9,9 @@ class CryptoReport:
     def __init__(self, convert='USD'):
         self.convert = convert
         self.currency_data = {}
-        self.today_return = 0
-        self.start_ts = datetime.now()
-        self.active_time = ''
+        self.today_return = None
+        self.start_ts = None
+        self.active_time = None
 
     def get_timestamp(self):
         """Returns formatted string of datetime.now()
@@ -29,6 +29,8 @@ class CryptoReport:
             convert (optional): string, (e.g. 'EUR') - defaults to 'USD'
 
         """
+
+        self.start_ts = datetime.now()
         print(bg.cyan + fg.black + 'Starting new session - ' +
               self.get_timestamp() + fg.rs + bg.rs)
         print(fg.blue + 'Fetching data...' + fg.rs)
