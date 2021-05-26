@@ -23,9 +23,13 @@ def write_report(convert='USD'):
 
     """
 
-    print(fg.blue + 'Fetching data...' + fg.rs)
-
     currency_data = {}
+    start_ts = datetime.now()
+    active_time = 0
+
+    print(bg.cyan + fg.black + 'Starting new session - ' +
+          get_timestamp() + fg.rs + bg.rs)
+    print(fg.blue + 'Fetching data...' + fg.rs)
 
     # Infos about the JSON file
     currency_data['timestamp'] = get_timestamp()
@@ -52,9 +56,22 @@ def write_report(convert='USD'):
 
         initial_value = yesterday_data['total_price_top_20_by_market_cap']
         final_value = currency_data['total_price_top_20_by_market_cap']
+        today_return = (final_value - initial_value) / initial_value * 100
 
-        currency_data['today_return'] = str(
-            (final_value - initial_value) / initial_value * 100) + " %"
+        currency_data['today_return'] = str(today_return) + " %"
+
+        # Display result to console
+        print(fg.blue + 'Investment return calculated: ' + fg.rs)
+        if today_return < 0:
+            # Bad investment return
+            print(
+                fg.yellow + currency_data['today_return'] + fg.rs)
+            print('Durate, et vosmet rebus servate secundis - Virgil, Aeneid I 207')
+        else:
+            # Good investment return
+            print(fg.green +
+                  currency_data['today_return'] + fg.rs)
+            print('Audentes fortuna iuvat - Virgil, Aeneid X 284')
 
     except FileNotFoundError:
         # The first time the bot is started, no file with yesterday's data will be available and a
@@ -66,3 +83,9 @@ def write_report(convert='USD'):
     # Save the data as JSON, with today's date as parte of the file.
     with open(f"./storage/crypto_data_{datetime.today().strftime('%d_%m_%Y')}.json", 'w') as outfile:
         json.dump(currency_data, outfile)
+
+    # Display duration in console
+    active_time = timedelta.total_seconds(datetime.now() - start_ts)
+    print(f"Task completed in {active_time} seconds")
+    print(fg.blue +
+          "Everything done for today, I'm going to sleep" + fg.rs)
