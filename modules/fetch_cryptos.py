@@ -23,20 +23,25 @@ def fetch_data(params):
         'Accepts': 'application/json',
         'X-CMC_PRO_API_KEY': os.getenv('API_KEY')
     }
+
     try:
         # Stops if not receing anything after 10 seconds
         res = requests.get(url=url, headers=headers,
                            params=params, timeout=10)
 
+        # If response.status is not 200:
         if not res.ok:
-            # print error message to console, status code and complete URL
+            # print error message from the server to console, status code and complete URL
             print(bg.red + 'Error:' + bg.rs + '  ' + fg.li_red + res.json()
                   ['status']['error_message'] + fg.rs)
+            # raise exception to stop the execution
             res.raise_for_status()
 
+        # If all is well:
         return res.json()['data']
 
     except requests.exceptions.RequestException as err:
+        # Kill execution and print stack trace in console
         raise SystemExit(err)
 
 ################################
@@ -68,6 +73,9 @@ def get_by_volume(convert='USD'):
         'volume_24h': crypto['quote'][convert]['volume_24h']
     }
     return top_by_volume
+
+
+################################
 
 
 def get_by_increment(convert='USD', order='desc'):
@@ -104,6 +112,8 @@ def get_by_increment(convert='USD', order='desc'):
 
     return top_ten
 
+################################
+
 
 def get_price(convert='USD', mode='marketCap', minVolume=76000000):
     """Returns infos about the total price of a variable number of cryptos depending on the specified parameters. 
@@ -129,6 +139,7 @@ def get_price(convert='USD', mode='marketCap', minVolume=76000000):
         params['limit'] = '20'
     elif mode == 'volume':
         params['volume_24h_min'] = minVolume
+        # limit defaults to 100
 
     cryptos = fetch_data(params)
 

@@ -26,8 +26,12 @@ def write_report(convert='USD'):
     print(fg.blue + 'Fetching data...' + fg.rs)
 
     currency_data = {}
+
+    # Infos about the JSON file
     currency_data['timestamp'] = get_timestamp()
     currency_data['converted_in'] = convert
+
+    # Data fetched from the API through helper functions
     currency_data['top_by_volume'] = get_by_volume(convert=convert)
     currency_data['top_by_increment'] = get_by_increment(convert=convert)
     currency_data['worst_by_increment'] = get_by_increment(
@@ -40,6 +44,7 @@ def write_report(convert='USD'):
     print(fg.green + 'Data retrieved successfully - ' + get_timestamp() + fg.rs)
     print(fg.blue + 'Calculating investment returns for today . . .' + fg.rs)
 
+    # Calculation of investment returns
     try:
         yesterday = datetime.today() - timedelta(days=1)
         with open(f"./storage/crypto_data_{yesterday.strftime('%d_%m_%Y')}.json", 'r') as openfile:
@@ -52,9 +57,12 @@ def write_report(convert='USD'):
             (final_value - initial_value) / initial_value * 100) + " %"
 
     except FileNotFoundError:
-        # The file is the first
-        print(fg.red + 'No data ara available for yesterday since this is the first time this bot is running... Skipping return calculations' + fg.rs)
+        # The first time the bot is started, no file with yesterday's data will be available and a
+        # FileNotFoundError will be raised. Here we catch it, print a message in console and continue
+        print(fg.red + 'No data ara available for yesterday since this is the first time this bot is \
+        running... Skipping return calculations' + fg.rs)
         pass
 
+    # Save the data as JSON, with today's date as parte of the file.
     with open(f"./storage/crypto_data_{datetime.today().strftime('%d_%m_%Y')}.json", 'w') as outfile:
         json.dump(currency_data, outfile)
