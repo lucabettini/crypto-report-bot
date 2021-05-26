@@ -1,3 +1,4 @@
 from modules.crypto_bot import crypto_bot
 
-crypto_bot(hour='15:55', convert='EUR')
+if __name__ == "__main__":
+    crypto_bot(hour='16:00', convert='EUR')
