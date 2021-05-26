@@ -20,9 +20,6 @@ class CryptoBot:
         self.report = report
 
     def run(self):
-        # spostarlo sul constructor, in modo da renderlo disponibile a altri metodi
-        # e cosi puoi rimuovere l'import e passargli l'import come parametro
-        # decoupling -> prendi due classi che sono codependent e rompi la dipendenza
 
         print(bg.green + fg.black + 'Starting bot - ' +
               self.report.get_timestamp() + fg.rs + bg.rs)

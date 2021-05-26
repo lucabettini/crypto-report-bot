@@ -6,8 +6,7 @@ from modules.fetch_cryptos import get_by_volume, get_by_increment, get_price
 
 
 class CryptoReport:
-    def __init__(self, convert='USD'):
-        self.convert = convert
+    def __init__(self):
         self.currency_data = {}
         self.today_return = None
         self.start_ts = None
@@ -20,7 +19,7 @@ class CryptoReport:
         """
         return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-    def write_report(self):
+    def write_report(self, convert='USD'):
         """Calls CoinMarketCap API and calculates what today percentile return 
         compared to yesterday if selling 1 unit of top 20 coins by market cap. 
         Writes all retrieved data, timestamp and calculation of JSON file. 
@@ -37,19 +36,19 @@ class CryptoReport:
 
         # Infos about the JSON file
         self.currency_data['timestamp'] = self.get_timestamp()
-        self.currency_data['converted_in'] = self.convert
+        self.currency_data['converted_in'] = convert
 
         # Data fetched from the API through helper functions
         self.currency_data['top_by_volume'] = get_by_volume(
-            convert=self.convert)
+            convert=convert)
         self.currency_data['top_by_increment'] = get_by_increment(
-            convert=self.convert)
+            convert=convert)
         self.currency_data['worst_by_increment'] = get_by_increment(
-            order='asc', convert=self.convert)
+            order='asc', convert=convert)
         self.currency_data['total_price_top_20_by_market_cap'] = get_price(
-            convert=self.convert)
+            convert=convert)
         self.currency_data['total_price_76mln_volume'] = get_price(
-            mode='volume', convert=self.convert)
+            mode='volume', convert=convert)
 
         print(fg.green + 'Data retrieved successfully - ' + fg.rs)
         print(fg.blue + 'Calculating investment returns for today . . .' + fg.rs)
