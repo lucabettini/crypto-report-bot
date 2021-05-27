@@ -19,17 +19,14 @@ class CryptoReport:
         """
         return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-    def write_report(self, convert='USD'):
-        """Calls CoinMarketCap API and calculates what today percentile return 
-        compared to yesterday if selling 1 unit of top 20 coins by market cap. 
-        Writes all retrieved data, timestamp and calculation of JSON file. 
+    def prepare_report(self, convert='USD'):
+        """Prints starting timestamps and stores them in internal property
 
-        Arguments: 
+         Arguments: 
             convert (optional): string, (e.g. 'EUR') - defaults to 'USD'
-
         """
-
         self.start_ts = datetime.now()
+        print('***************************************')
         print(bg.cyan + fg.black + 'Starting new session - ' +
               self.get_timestamp() + fg.rs + bg.rs)
         print(fg.blue + 'Fetching data...' + fg.rs)
@@ -38,7 +35,12 @@ class CryptoReport:
         self.currency_data['timestamp'] = self.get_timestamp()
         self.currency_data['converted_in'] = convert
 
-        # Data fetched from the API through helper functions
+    def fetchData(self, convert='USD'):
+        """Fetches data from CoinMarketCap API.
+
+         Arguments: 
+            convert (optional): string, (e.g. 'EUR') - defaults to 'USD'
+        """
         self.currency_data['top_by_volume'] = get_by_volume(
             convert=convert)
         self.currency_data['top_by_increment'] = get_by_increment(
@@ -51,6 +53,12 @@ class CryptoReport:
             mode='volume', convert=convert)
 
         print(fg.green + 'Data retrieved successfully - ' + fg.rs)
+
+    def calculateReturns(self):
+        """Calculates what today percentile return compared to yesterday if selling 
+            1 unit of top 20 coins by market cap. 
+        """
+
         print(fg.blue + 'Calculating investment returns for today . . .' + fg.rs)
 
         # Calculation of investment returns
@@ -86,13 +94,29 @@ class CryptoReport:
             running... Skipping return calculations' + fg.rs)
             pass
 
-        # Save the data as JSON, with today's date as parte of the file.
-        with open(f"./storage/crypto_data_{datetime.today().strftime('%d_%m_%Y')}.json", 'w') as outfile:
-            json.dump(self.currency_data, outfile)
-
+    def display_duration(self):
+        """Displays duration of operations in console
+        """
         # Display duration in console
         self.active_time = timedelta.total_seconds(
             datetime.now() - self.start_ts)
         print(f"Task completed in {self.active_time} seconds")
         print(fg.blue +
               "Everything done for today, I'm going to sleep" + fg.rs)
+
+    def write_report(self, convert='USD'):
+        """Calls CoinMarketCap API, calculates investment returns and writes fetched data, result and timestamp in a JSON file. 
+
+        Arguments: 
+            convert (optional): string, (e.g. 'EUR') - defaults to 'USD'
+        """
+
+        self.prepare_report(convert)
+        self.fetchData(convert)
+        self.calculateReturns()
+
+        # Save the data as JSON, with today's date as parte of the file.
+        with open(f"./storage/crypto_data_{datetime.today().strftime('%d_%m_%Y')}.json", 'w') as outfile:
+            json.dump(self.currency_data, outfile)
+
+        self.display_duration()
