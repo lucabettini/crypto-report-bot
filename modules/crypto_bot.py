@@ -14,7 +14,8 @@ def crypto_bot(hour='00:00', convert='USD'):
         convert (optional): string, (e.g. 'EUR') - defaults to 'USD'
     """
 
-    print(bg.green + fg.black + 'Starting bot - ' + get_timestamp() + bg.rs)
+    print(bg.green + fg.black + 'Starting bot - ' +
+          get_timestamp() + fg.rs + bg.rs)
 
     schedule.every().day.at(hour).do(lambda: write_report(convert))
 
