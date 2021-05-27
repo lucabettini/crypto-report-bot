@@ -1,5 +1,4 @@
 .env
-/storage
 /.venv
 __pycache__/
 INFO.md

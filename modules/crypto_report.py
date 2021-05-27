@@ -5,12 +5,20 @@ from sty import fg, bg, rs
 from modules.fetch_cryptos import get_by_volume, get_by_increment, get_price
 
 
+class DifferentConvertError (Exception):
+    # This exception is raised in calculate_returns
+    # if no history data with the same conversion are available
+    pass
+
+
 def get_timestamp():
     """Returns formatted string of datetime.now()
 
     Format: dd/mm/YY hh:mm:ss
     """
     return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+#########################################
 
 
 def prepare_report(convert='USD'):
@@ -55,7 +63,7 @@ def fetchData(convert='USD'):
     }
 
 
-def calculateReturns(total_price):
+def calculate_returns(total_price, convert='USD'):
     """Calculates what today percentile return compared to yesterday if selling 
             1 unit of top 20 coins by market cap. 
     Arguments: 
@@ -71,6 +79,9 @@ def calculateReturns(total_price):
         yesterday = datetime.today() - timedelta(days=1)
         with open(f"./storage/crypto_data_{yesterday.strftime('%d_%m_%Y')}.json", 'r') as openfile:
             yesterday_data = json.load(openfile)
+
+        if (convert != yesterday_data['converted_in']):
+            raise DifferentConvertError()
 
         initial_value = yesterday_data['total_price_top_20_by_market_cap']
         final_value = total_price
@@ -99,8 +110,13 @@ def calculateReturns(total_price):
     except FileNotFoundError:
         # The first time the bot is started, no file with yesterday's data will be available and a
         # FileNotFoundError will be raised. Here we catch it, print a message in console and continue
-        print(fg.red + 'No data ara available for yesterday since this is the first time this bot is \
-        running... Skipping return calculations' + fg.rs)
+        print(fg.yellow + "No data ara available for yesterday since this is the first time this bot is running"
+              + '\n' + "Skipping return calculations" + fg.rs)
+        pass
+
+    except DifferentConvertError:
+        print(fg.yellow + "No data ara available for yesterday with the same currency conversion"
+              + '\n' + "Skipping return calculations" + fg.rs)
         pass
 
 
@@ -116,6 +132,8 @@ def display_duration(timestamp):
           "Everything done for today, I'm going to sleep" + fg.rs)
 
 
+#########################################
+
 def write_report(convert='USD'):
     """Calls CoinMarketCap API, calculates investment returns and writes fetched data, result and timestamp in a JSON file. 
         Arguments: 
@@ -124,11 +142,14 @@ def write_report(convert='USD'):
     """
     start_ts = datetime.now()
 
-    fetched_data = {**prepare_report(convert), **fetchData(convert)}
+    currency_data = {**prepare_report(convert), **fetchData(convert)}
     print(fg.green + 'Data retrieved successfully - ' + get_timestamp() + fg.rs)
 
-    currency_data = {**fetched_data, **
-                     calculateReturns(fetched_data['total_price_top_20_by_market_cap'])}
+    # Check if the returns could be calculated before adding them in the dictionary
+    calculated_returns = calculate_returns(
+        total_price=currency_data['total_price_top_20_by_market_cap'], convert=convert)
+    if (calculated_returns):
+        currency_data = {**currency_data, **calculated_returns}
 
     # Save the data as JSON, with today's date as parte of the file.
     with open(f"./storage/crypto_data_{datetime.today().strftime('%d_%m_%Y')}.json", 'w') as outfile:
