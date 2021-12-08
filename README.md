@@ -69,4 +69,4 @@ Open main.py, adjust the parameters to your liking, and start the bot by running
 
 ---
 
-Made by [Luca Bettini](https://lucabettini.github.io/).
+Made by [Luca Bettini](https://lucabettini.com).
